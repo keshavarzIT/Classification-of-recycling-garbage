@@ -1,0 +1,70 @@
+##Classification
+import pandas as pd
+
+dataset = pd.read_csv('iris.csv')
+x = dataset.iloc[:, 0:4]
+y = dataset.iloc[: , 4]
+
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+y_encoded = le.fit_transform(y)
+print(y)
+print(y_encoded)
+
+from sklearn.model_selection import train_test_split
+xtrain , xtest,ytrain , ytest = train_test_split(x,y_encoded, test_size=0.2)
+from sklearn.linear_model import LogisticRegression
+model = LogisticRegression().fit(xtrain, ytrain)
+y_pred = model.predict(xtest)    
+
+print(ytest)
+print(y_pred)
+
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+print('Accuracy is ' , accuracy_score(ytest , y_pred))
+#Confusion Matrix
+
+y_pred = le.fit_transform(y_pred)
+ytest = le.fit_transform(ytest)
+matrix = confusion_matrix(ytest, y_pred, labels=[0,1,2])
+print(matrix)
+
+# y_pred_origin = le.inverse_transform(y_pred)
+# print(y_pred_origin)
+
+import matplotlib.pyplot as plt
+import itertools
+import numpy as np
+
+def ShowConfusionMatrix(cm, classes, title='confusion matrix',
+                        cmap1 =  plt.cm.Greens):
+    plt.imshow(cm,interpolation='nearest', cmap = cmap1) #bilinear
+    plt.title(title)
+    tick_marks = np.arange(len(classes)) # [0,1,2]
+    plt.xticks(tick_marks, ['a','b','c'], rotation = 90)
+    plt.yticks(tick_marks, classes, rotation = 270)
+    thresh = cm.max() / 2
+    for i, j, in itertools.product([0,1,2],[0,1,2]): #range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j , i , format(cm[i,j] , '0.2f'),
+                 horizontalalignment = 'center',
+                 color='white' if cm[i,j] > thresh else "black")
+    plt.ylabel('Actual label')        
+    plt.xlabel('Predicted label')
+    plt.tight_layout()
+    plt.show()
+
+
+ShowConfusionMatrix(cm = matrix, classes=le.classes_, title='Confusion matrix for Iris',
+                    cmap1 =  plt.cm.Reds)    
+print('###############################################')
+print(range(matrix.shape[0]))
+print(range(matrix.shape[1]))
+p = model.predict([[1,4,9,2]])
+names= ['setusa','versicolor','viginika']
+print(names[p[0]])
+
+
+
+
+
